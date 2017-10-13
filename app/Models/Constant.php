@@ -61,21 +61,4 @@ class Constant extends Model
     {
         return $this->allUsers()->withPivot("is_active")->wherePivot("is_active", 1);
     }
-
-
-     /**
-     * All Permissions associated with this
-     */
-    public function allPermissions()
-    {
-        return $this->morphMany("App\Models\Permission", 'permissionable');
-    }
-
-    /**
-     * Only active Permissions associated with this
-     */
-    public function permissions()
-    {
-        return $this->allPermissions()->where("is_active", 1);
-    }
 }
