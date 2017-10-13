@@ -17,8 +17,8 @@ class HotelsController extends Controller
     protected $room_types = array(
         array("id" => 1, "label" => "Single", "description" => "A room which has single bed facility"),
         array("id" => 1, "label" => "Double", "description" => "A room which has double bed facility"),
-        array("id" => 1, "label" => "Double-double", "description" => "A room which has two double bed facility seperated by a center table"),
-        array("id" => 1, "label" => "Twin", "description" => "A room which has two single bed seperated by a center table"),
+        array("id" => 1, "label" => "Double-double", "description" => "A room which has two double bed facility separated by a center table"),
+        array("id" => 1, "label" => "Twin", "description" => "A room which has two single bed separated by a center table"),
         array("id" => 1, "label" => "Interconnecting", "description" => "Two rooms which shares a common door, mostly used by families"),
         array("id" => 1, "label" => "Adjoining", "description" => "Two rooms which share a common wall, mostly preferred by groups"),
         array("id" => 1, "label" => "Hollywood Twin", "description" => "A room which ahs two single bed but shares a common head board"),
@@ -76,6 +76,8 @@ class HotelsController extends Controller
         // TODO: validate the user input
         $name = $request->name;
         $locations = $request->locations;
+        $roomTypes = $request->roomTypes;
+        $mealPlans = $request->mealPlans;
 
 
         $creator = Auth::id();
@@ -84,17 +86,36 @@ class HotelsController extends Controller
         $hotel->name = $name;
         $hotel->created_by = $creator;
 
-        // bind trip and location
         $toAttachLocations = array();
         foreach ($locations as $locationId) {
             $toAttachLocations[$locationId] = ["created_by" => $creator];
         }
+
+        $toAttachRoomTypes = array();
+        foreach ($roomTypes as $roomTypeId) {
+            $toAttachRoomTypes[$roomTypeId] = ["created_by" => $creator];
+        }
+
+        $toAttachMealPlans = array();
+        foreach ($mealPlans as $mealPlanId) {
+            $toAttachMealPlans[$mealPlanId] = ["created_by" => $creator];
+        }
+
 
         DB::beginTransaction();
         $hotel->save();
         if (count($toAttachLocations)) {
             $hotel->locations()->attach($toAttachLocations);
         }
+
+        if (count($toAttachRoomTypes)) {
+            $hotel->roomTypes()->attach($toAttachRoomTypes);
+        }
+
+        if (count($toAttachMealPlans)) {
+            $hotel->mealPlans()->attach($toAttachMealPlans);
+        }
+
         DB::commit();
 
         return $this->show($request, $hotel->id);
@@ -109,7 +130,7 @@ class HotelsController extends Controller
     public function show(Request $req, $hotel_id)
     {
 
-        $hotel = Hotel::where("id", $hotel_id)->with("locations", "contacts")->first();
+        $hotel = Hotel::where("id", $hotel_id)->with("locations", "contacts", "roomTypes", "mealPlans")->first();
 
         if (!$hotel) {
             throw new NotFoundHttpException("Hotel not found.");

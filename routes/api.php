@@ -125,6 +125,34 @@ $api->version('v1', function ($api) {
             "as" => "api.hotels.addContact"
         ]);
 
+        // hotel room types
+        $api->get("/hotel-room-types", [
+            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@index",
+            "as" => "api.hotel-room-types.index"
+        ]);
+        $api->post("/hotel-room-types", [
+            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@store",
+            "as" => "api.hotel-room-types.store"
+        ]);
+        $api->get("/hotel-room-types/{roomType}", [
+            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@show",
+            "as" => "api.hotel-room-types.show"
+        ]);
+
+        // hotel meal plans
+        $api->get("/hotel-meal-plans", [
+            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@index",
+            "as" => "api.hotel-room-types.index"
+        ]);
+        $api->post("/hotel-meal-plans", [
+            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@store",
+            "as" => "api.hotel-room-types.store"
+        ]);
+        $api->get("/hotel-meal-plans/{mealPlan}", [
+            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@show",
+            "as" => "api.hotel-meal-plans.show"
+        ]);
+
         /**
          * Routes for locations
          */
