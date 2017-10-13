@@ -25,7 +25,7 @@ class Controller extends BaseController
         if (!$constant) {
             throw new NotFoundHttpException("Role not found.");
         }
-        return ["data" => $this->model::where("id", $constant_id)->first()];
+        return ["data" => $constant];
     }
 
     public function store(Request $request)

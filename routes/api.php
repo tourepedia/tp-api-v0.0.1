@@ -75,6 +75,18 @@ $api->version('v1', function ($api) {
             "uses" => "App\Http\Controllers\Constants\UserRolesController@show",
             "as" => "api.user-roles.show"
         ]);
+        $api->post("/roles/{role}/update-permissions", [
+            "uses" => "App\Http\Controllers\Constants\UserRolesController@updatePermissions",
+            "as" => "api.user-roles.update-permissions"
+        ]);
+
+        /**
+         * Routes for permissions
+         */
+        $api->get("/permissions/{for}", [
+            "uses" => "App\Http\Controllers\PermissionsController@index",
+            "as" => "api.permissions.index"
+        ]);
 
         /**
          * Routes for Contact resource

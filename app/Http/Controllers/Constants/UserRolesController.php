@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Constants;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Constants\Controller;
 
-use App\Models\Constants\UserRole as Role;
 use Auth;
+use App\Models\Constants\UserRole as Role;
+use App\Models\Permission;
 
 class UserRolesController extends Controller
 {
@@ -26,7 +27,7 @@ class UserRolesController extends Controller
      */
     public function getItem($role_id)
     {
-        return $this->model::where("id", $role_id)->first();
+        return $this->model::where("id", $role_id)->with("permissions")->first();
     }
 
 
@@ -36,23 +37,25 @@ class UserRolesController extends Controller
      * @param  Role    $role    [description]
      * @return [type]           [description]
      */
-    public function updatePermissions(Request $request, Role $role)
+    public function updatePermissions(Request $request, $role_id)
     {
+        $role = $this->model::where("id", $role_id)->first();
+
         // TODO: validate the request
 
         $permissions = $request->permissions;
-
-        if (!$permissions) {
-            return back();
-        }
-
         $user_id = Auth::id();
-        $syncPermissions = [];
-        foreach ($permissions as $permission) {
-            $syncPermissions[$permission] = [ "created_by" => $user_id ];
-        }
 
-        $role->permissions()->sync($syncPermissions);
+        // inactive the permission
+        $role->permissions()->update(["is_active" => 0]);
+
+        foreach ($permissions as $permission) {
+            $new_permission = new Permission();
+            $new_permission->permission = $permission;
+            $new_permission->created_by = $user_id;
+
+            $role->permissions()->save($new_permission);
+        }
 
         return $this->show($request, $role->id);
     }

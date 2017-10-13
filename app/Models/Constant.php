@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Constants\ConstantableTrait;
 
 class Constant extends Model
 {
+    use ConstantableTrait;
+
     /**
      * Table Name
      * @var string
@@ -45,9 +48,9 @@ class Constant extends Model
     /**
      * Get all users associated with this constant
      */
-    public function allUser()
+    public function allUsers()
     {
-        return $this->morphedByMany('App\Models\User', 'constantable');
+        return $this->morphedByManyContant('App\Models\User');
     }
 
 
@@ -57,5 +60,22 @@ class Constant extends Model
     public function users()
     {
         return $this->allUsers()->withPivot("is_active")->wherePivot("is_active", 1);
+    }
+
+
+     /**
+     * All Permissions associated with this
+     */
+    public function allPermissions()
+    {
+        return $this->morphMany("App\Models\Permission", 'permissionable');
+    }
+
+    /**
+     * Only active Permissions associated with this
+     */
+    public function permissions()
+    {
+        return $this->allPermissions()->where("is_active", 1);
     }
 }

@@ -22,6 +22,8 @@ class PolymorphicMapServiceProvider extends ServiceProvider
             "quote" => \App\Models\Quote::class,
             "task" => \App\Models\Task::class,
             "comment" => \App\Models\Comment::class,
+            "constant" => \App\Models\Constant::class,
+            "user_role" => \App\Models\Constants\UserRole::class,
         ]);
     }
 

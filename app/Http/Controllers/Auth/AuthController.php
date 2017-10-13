@@ -142,6 +142,18 @@ class AuthController extends Controller
         if (!$user->roles) {
             $user->load("roles");
         }
+        $user->permissions = collect([]);
+        foreach ($user->roles as $role) {
+            if (!$role->permissions) {
+                $role->load("permissions");
+            }
+            // attach the permissions to the user object
+            $permissions = $role->permissions->pluck("permission");
+            $user->permissions = $user->permissions->merge($permissions);
+            unset($role->permissions);
+        }
+
+
         return new JsonResponse([
             'message' => 'authenticated_user',
             'data' => $user
