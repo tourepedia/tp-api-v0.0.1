@@ -15,13 +15,13 @@ class PolymorphicMapServiceProvider extends ServiceProvider
     public function boot()
     {
         Relation::morphMap([
-            "contact" => \App\Contact::class,
-            "user" => \App\User::class,
-            "trip" => \App\Trip::class,
-            "hotel" => \App\Hotel::class,
-            "quote" => \App\Quote::class,
-            "task" => \App\Task::class,
-            "comment" => \App\Comment::class,
+            "contact" => \App\Models\Contact::class,
+            "user" => \App\Models\User::class,
+            "trip" => \App\Models\Trip::class,
+            "hotel" => \App\Models\Hotel::class,
+            "quote" => \App\Models\Quote::class,
+            "task" => \App\Models\Task::class,
+            "comment" => \App\Models\Comment::class,
         ]);
     }
 

@@ -45,16 +45,20 @@ class UsersController extends Controller
     /**
      * Update the role of a user
      */
-    public function updateRole(Request $request)
+    public function updateRoles(Request $request, $user_id)
     {
         // TODO: only allow admin users to update the role
-        $user_id = $request->userId;
-        $role_id = $request->roleId;
+        $roles = $request->roles;
 
         $user = User::findOrFail($user_id);
 
-        $user->roles()->sync([$role_id => ["created_by" => Auth::id()]]);
+        $syncRoles = [];
+        foreach ($roles as $role_id) {
+            $syncRoles[$role_id] = ["created_by" => Auth::id()];
+        }
 
-        return back();
+        $user->roles()->sync($syncRoles);
+
+        return $this->show($request, $user_id);
     }
 }

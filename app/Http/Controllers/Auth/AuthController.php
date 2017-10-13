@@ -138,9 +138,13 @@ class AuthController extends Controller
      */
     public function getUser()
     {
+        $user = JWTAuth::parseToken()->authenticate();
+        if (!$user->roles) {
+            $user->load("roles");
+        }
         return new JsonResponse([
             'message' => 'authenticated_user',
-            'data' => JWTAuth::parseToken()->authenticate()
+            'data' => $user
         ]);
     }
 }

@@ -55,6 +55,10 @@ $api->version('v1', function ($api) {
             "uses" => "App\Http\Controllers\UsersController@show",
             "as" => "api.users.show"
         ]);
+        $api->post("/users/{user}/update-roles", [
+            "uses" => "App\Http\Controllers\UsersController@updateRoles",
+            "as" => "api.users.update-roles"
+        ]);
 
         /**
          * Routes for Roles
