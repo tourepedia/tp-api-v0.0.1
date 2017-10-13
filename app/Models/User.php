@@ -74,7 +74,7 @@ class User extends Model implements
      */
     public function allRoles()
     {
-        return $this->morphToManyContant('App\Models\Constants\UserRole');
+        return $this->morphToManyConstant('App\Models\Constants\UserRole');
     }
 
 

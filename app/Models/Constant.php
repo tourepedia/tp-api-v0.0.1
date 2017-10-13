@@ -50,7 +50,7 @@ class Constant extends Model
      */
     public function allUsers()
     {
-        return $this->morphedByManyContant('App\Models\User');
+        return $this->morphedByManyConstant('App\Models\User');
     }
 
 
