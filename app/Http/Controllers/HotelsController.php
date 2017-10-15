@@ -9,6 +9,9 @@ use App\Models\Hotel;
 use App\Models\Location;
 use App\Models\Contact;
 use App\Models\Phone;
+use App\Models\DateTime;
+use App\Models\HotelPrice;
+use App\Models\Price;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class HotelsController extends Controller
@@ -130,7 +133,7 @@ class HotelsController extends Controller
     public function show(Request $req, $hotel_id)
     {
 
-        $hotel = Hotel::where("id", $hotel_id)->with("locations", "contacts", "roomTypes", "mealPlans")->first();
+        $hotel = Hotel::where("id", $hotel_id)->with("locations", "contacts", "roomTypes", "mealPlans", "prices")->first();
 
         if (!$hotel) {
             throw new NotFoundHttpException("Hotel not found.");
@@ -173,18 +176,89 @@ class HotelsController extends Controller
         //
     }
 
-    public function addPricing(Request $request, $hotel_id)
+    public function storePrice(Request $request, $hotel_id)
     {
         $hotel = Hotel::findOrFail($hotel_id);
 
-        return view("hotels.addPricing", ["hotel" => $hotel, "room_types" => $this->room_types, "meal_plans" => $this->meal_plans]);
-    }
+        if (!$hotel) {
+            throw new NotFoundHttpException("Hotel not found.");
+        }
 
-    public function storePricing(Request $request, $hotel_id)
-    {
-        $hotel = Hotel::findOrFail($hotel_id);
+        $data = $request->only(
+            "locations",
+            "meal_plans",
+            "room_types",
+            "adults_web",
+            "child_web",
+            "child_woeb",
+            "start_date",
+            "end_date",
+            "price"
+        );
 
-        return redirect()->route("hotel", ["hotel_id" => $hotel->id]);
+        $data["created_by"] = Auth::id();
+
+        $hotelPrice = new HotelPrice();
+        $hotelPrice->adults_with_extra_bed = $data["adults_web"];
+        $hotelPrice->children_with_extra_bed = $data["child_web"];
+        $hotelPrice->children_without_extra_bed = $data["child_woeb"];
+        $hotelPrice->created_by = $data["created_by"];
+
+        $toAttachLocations = array();
+        foreach ($data["locations"] as $locationId) {
+            $toAttachLocations[$locationId] = ["created_by" => $data["created_by"]];
+        }
+
+        $toAttachRoomTypes = array();
+        foreach ($data["room_types"] as $rtId) {
+            $toAttachRoomTypes[$rtId] = ["created_by" => $data["created_by"]];
+        }
+
+        $toAttachMealPlans = array();
+        foreach ($data["meal_plans"] as $mpId) {
+            $toAttachMealPlans[$mpId] = ["created_by" => $data["created_by"]];
+        }
+
+
+        $startDate = new DateTime();
+        $startDate->value = $data["start_date"];
+        $startDate->created_by = $data["created_by"];
+        $startDate->role = "start_date";
+
+        $endDate = new DateTime();
+        $endDate->value = $data["end_date"];
+        $endDate->created_by = $data["created_by"];
+        $endDate->role = "end_date";
+
+        // create price
+        $price = new Price();
+        $price->value = $data["price"];
+        $price->created_by = $data["created_by"];
+
+        // start the transaction
+        DB::beginTransaction();
+
+        $hotel->prices()->save($hotelPrice);
+
+        if (count($toAttachLocations)) {
+            $hotelPrice->locations()->attach($toAttachLocations);
+        }
+        if (count($toAttachRoomTypes)) {
+            $hotelPrice->roomTypes()->attach($toAttachRoomTypes);
+        }
+        if (count($toAttachMealPlans)) {
+            $hotelPrice->mealPlans()->attach($toAttachMealPlans);
+        }
+
+
+        $hotelPrice->prices()->save($price);
+
+        $hotelPrice->dates()->save($startDate);
+        $hotelPrice->dates()->save($endDate);
+
+        DB::commit();
+
+        return $this->show($request, $hotel->id);
     }
 
     public function addContact(Request $request, $hotel_id)

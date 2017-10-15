@@ -24,6 +24,9 @@ class PolymorphicMapServiceProvider extends ServiceProvider
             "comment" => \App\Models\Comment::class,
             "constant" => \App\Models\Constant::class,
             "user_role" => \App\Models\Constants\UserRole::class,
+            "hotel_room_type" => \App\Models\Constants\HotelRoomType::class,
+            "hotel_meal_plan" => \App\Models\Constants\HotelMealPlan::class,
+            "datetime" => \App\Models\DateTime::class,
         ]);
     }
 

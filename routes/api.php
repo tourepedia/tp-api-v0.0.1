@@ -122,7 +122,11 @@ $api->version('v1', function ($api) {
         ]);
         $api->post("/hotels/{hotel}/add-contact", [
             "uses" => "App\Http\Controllers\HotelsController@storeContact",
-            "as" => "api.hotels.addContact"
+            "as" => "api.hotels.add-contact"
+        ]);
+        $api->post("/hotels/{hotel}/add-price", [
+            "uses" => "App\Http\Controllers\HotelsController@storePrice",
+            "as" => "api.hotels.add-price"
         ]);
 
         // hotel room types

@@ -60,4 +60,12 @@ class Hotel extends Model
     {
         return $this->allMealPlans()->withPivot("is_active")->where("is_active", 1);
     }
+
+    /**
+     * quotes
+     */
+    public function prices()
+    {
+        return $this->hasMany("App\Models\HotelPrice");
+    }
 }
