@@ -116,6 +116,10 @@ $api->version('v1', function ($api) {
             "uses" => "App\Http\Controllers\HotelsController@store",
             "as" => "api.hotels.store"
         ]);
+        $api->get("/hotels/search", [
+            "uses" => "App\Http\Controllers\HotelsController@search",
+            "as" => "api.hotels.search"
+        ]);
         $api->get("/hotels/{hotel}", [
             "uses" => "App\Http\Controllers\HotelsController@show",
             "as" => "api.hotels.show"

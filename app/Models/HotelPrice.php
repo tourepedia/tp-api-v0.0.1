@@ -27,10 +27,6 @@ class HotelPrice extends Model
             $builder->with("prices");
         });
 
-        static::addGlobalScope('withDates', function (Builder $builder) {
-            $builder->with("dates");
-        });
-
         static::addGlobalScope('withLocations', function (Builder $builder) {
             $builder->with("locations");
         });
@@ -97,14 +93,5 @@ class HotelPrice extends Model
     public function prices()
     {
         return $this->morphMany("App\Models\Price", "priceable")->where("prices.is_active", 1);
-    }
-
-
-    /**
-     * Get associated dates
-     */
-    public function dates()
-    {
-        return $this->morphMany("App\Models\DateTime", "date_timable")->where("date_times.is_active", 1);
     }
 }

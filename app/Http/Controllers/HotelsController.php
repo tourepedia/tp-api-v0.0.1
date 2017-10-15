@@ -9,10 +9,11 @@ use App\Models\Hotel;
 use App\Models\Location;
 use App\Models\Contact;
 use App\Models\Phone;
-use App\Models\DateTime;
 use App\Models\HotelPrice;
 use App\Models\Price;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Dingo\Api\Exception\ResourceException;
 
 class HotelsController extends Controller
 {
@@ -202,7 +203,8 @@ class HotelsController extends Controller
         $hotelPrice->adults_with_extra_bed = $data["adults_web"];
         $hotelPrice->children_with_extra_bed = $data["child_web"];
         $hotelPrice->children_without_extra_bed = $data["child_woeb"];
-        $hotelPrice->created_by = $data["created_by"];
+        $hotelPrice->start_date = $data["start_date"];
+        $hotelPrice->end_date = $data["end_date"];
 
         $toAttachLocations = array();
         foreach ($data["locations"] as $locationId) {
@@ -219,16 +221,6 @@ class HotelsController extends Controller
             $toAttachMealPlans[$mpId] = ["created_by" => $data["created_by"]];
         }
 
-
-        $startDate = new DateTime();
-        $startDate->value = $data["start_date"];
-        $startDate->created_by = $data["created_by"];
-        $startDate->role = "start_date";
-
-        $endDate = new DateTime();
-        $endDate->value = $data["end_date"];
-        $endDate->created_by = $data["created_by"];
-        $endDate->role = "end_date";
 
         // create price
         $price = new Price();
@@ -250,11 +242,7 @@ class HotelsController extends Controller
             $hotelPrice->mealPlans()->attach($toAttachMealPlans);
         }
 
-
         $hotelPrice->prices()->save($price);
-
-        $hotelPrice->dates()->save($startDate);
-        $hotelPrice->dates()->save($endDate);
 
         DB::commit();
 
@@ -300,5 +288,41 @@ class HotelsController extends Controller
         DB::commit();
 
         return $this->show($request, $hotel_id);
+    }
+
+    public function search(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            "q" => "required",
+        ]);
+
+        if ($validator->fails()) {
+            throw new ResourceException('Invalid request.', $validator->errors());
+        }
+
+        $q = $request->get("q");
+        $with = $request->get("with");
+        $tripStartDate = $request->get("tripStartDate");
+
+        $hotels = Hotel::where(function ($query) use ($q) {
+            return $query->where("name", "LIKE", "%$q%")
+            ->orWhereHas("locations", function ($location) use ($q) {
+                return $location->where("name", "LIKE", "%$q%");
+            });
+        })->when($with && array_search("prices", $with) !== false, function ($query) use ($tripStartDate) {
+            return $query->when($tripStartDate, function ($q) use ($tripStartDate) {
+                return $q->whereHas("prices", function ($prices) use ($tripStartDate) {
+                    return $prices->where("start_date", "<=", $tripStartDate)->where("end_date", ">=", $tripStartDate);
+                });
+            })->with(["prices" => function ($prices) use ($tripStartDate) {
+                if ($tripStartDate) {
+                    return $prices->where("start_date", "<=", $tripStartDate)->where("end_date", ">=", $tripStartDate);
+                }
+                return $prices;
+            }]);
+        })->with("locations")->limit(20)->get();
+
+        return ["data" => $hotels];
     }
 }

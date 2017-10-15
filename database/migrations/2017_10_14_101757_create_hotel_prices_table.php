@@ -19,6 +19,8 @@ class CreateHotelPricesTable extends Migration
             $table->integer("adults_with_extra_bed")->default(0);
             $table->integer("children_with_extra_bed")->default(0);
             $table->integer("children_without_extra_bed")->default(0);
+            $table->timestamp("start_date");
+            $table->timestamp("end_date");
             $table->integer("created_by");
             $table->softDeletes();
             $table->timestamps();
