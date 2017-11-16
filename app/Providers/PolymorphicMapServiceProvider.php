@@ -22,10 +22,9 @@ class PolymorphicMapServiceProvider extends ServiceProvider
             "quote" => \App\Models\Quote::class,
             "task" => \App\Models\Task::class,
             "comment" => \App\Models\Comment::class,
-            "constant" => \App\Models\Constant::class,
-            "user_role" => \App\Models\Constants\UserRole::class,
-            "hotel_room_type" => \App\Models\Constants\HotelRoomType::class,
-            "hotel_meal_plan" => \App\Models\Constants\HotelMealPlan::class,
+            "user_role" => \App\Models\Tags\UserRole::class,
+            "hotel_room_type" => \App\Models\Tags\RoomType::class,
+            "hotel_meal_plan" => \App\Models\Tags\MealPlan::class,
             "hotel_price" => \App\Models\HotelPrice::class,
         ]);
     }

@@ -17,35 +17,6 @@ use Dingo\Api\Exception\ResourceException;
 
 class HotelsController extends Controller
 {
-
-    protected $room_types = array(
-        array("id" => 1, "label" => "Single", "description" => "A room which has single bed facility"),
-        array("id" => 1, "label" => "Double", "description" => "A room which has double bed facility"),
-        array("id" => 1, "label" => "Double-double", "description" => "A room which has two double bed facility separated by a center table"),
-        array("id" => 1, "label" => "Twin", "description" => "A room which has two single bed separated by a center table"),
-        array("id" => 1, "label" => "Interconnecting", "description" => "Two rooms which shares a common door, mostly used by families"),
-        array("id" => 1, "label" => "Adjoining", "description" => "Two rooms which share a common wall, mostly preferred by groups"),
-        array("id" => 1, "label" => "Hollywood Twin", "description" => "A room which ahs two single bed but shares a common head board"),
-        array("id" => 1, "label" => "Duplex", "description" => "A room which is been spread on two floors connected by an internal staicase"),
-        array("id" => 1, "label" => "Canaba", "description" => "A room which is near a water body or beside swimming pool"),
-        array("id" => 1, "label" => "Studio", "description" => "A room with a sofa-cum-bed facility"),
-        array("id" => 1, "label" => "Parlor", "description" => "A room which is used for sitting and cannot be used for sleeping purpose"),
-        array("id" => 1, "label" => "Lanai", "description" => "A room which oversees a scenic beauty e.g. Garden, landscape or water fall"),
-        array("id" => 1, "label" => "Efficiency", "description" => "A room with a kitchen facility"),
-        array("id" => 1, "label" => "Hospitality", "description" => "A room where hotel staff would entertain their guests"),
-        array("id" => 1, "label" => "Suit", "description" => "A room comparises of two or more bedroom, a living room and a dining area"),
-        array("id" => 1, "label" => "King", "description" => "A room with a king sized bed"),
-        array("id" => 1, "label" => "Queen", "description" => "A room with a queen sized bed"),
-    );
-
-    protected $meal_plans = array(
-        array("id" => 1, "label" => "AP", "description" => "American Plan (Breakfast, Lunch & Dinner)"),
-        array("id" => 2, "label" => "MAP", "description" => "Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)"),
-        array("id" => 3, "label" => "CP", "description" => "Continental Plan (Breakfast)"),
-        array("id" => 4, "label" => "EP", "description" => "European Plan (No Meal)"),
-    );
-
-
     /**
      * Display a listing of the resource.
      *
@@ -65,7 +36,8 @@ class HotelsController extends Controller
      */
     public function create()
     {
-        $locations = Location::where("country_id", 101)->select("id", "short_name", "name")->orderBy("short_name")->get();
+        $locations = Location::where("country_id", 101)
+            ->select("id", "short_name", "name")->orderBy("short_name")->get();
         return view("hotels.new", ["locations" => $locations]);
     }
 
@@ -82,6 +54,8 @@ class HotelsController extends Controller
         $locations = $request->locations;
         $roomTypes = $request->roomTypes;
         $mealPlans = $request->mealPlans;
+        $eb_child_age_start = $request->eb_child_age_start;
+        $eb_child_age_end = $request->eb_child_age_end;
 
 
         $creator = Auth::id();
@@ -89,6 +63,8 @@ class HotelsController extends Controller
         $hotel = new Hotel();
         $hotel->name = $name;
         $hotel->created_by = $creator;
+        $hotel->eb_child_age_start = $eb_child_age_start;
+        $hotel->eb_child_age_end = $eb_child_age_end;
 
         $toAttachLocations = array();
         foreach ($locations as $locationId) {
@@ -134,7 +110,8 @@ class HotelsController extends Controller
     public function show(Request $req, $hotel_id)
     {
 
-        $hotel = Hotel::where("id", $hotel_id)->with("locations", "contacts", "roomTypes", "mealPlans", "prices")->first();
+        $hotel = Hotel::where("id", $hotel_id)
+            ->with("locations", "contacts", "roomTypes", "mealPlans", "prices")->first();
 
         if (!$hotel) {
             throw new NotFoundHttpException("Hotel not found.");
@@ -189,60 +166,42 @@ class HotelsController extends Controller
             "locations",
             "meal_plans",
             "room_types",
-            "adults_web",
-            "child_web",
-            "child_woeb",
-            "start_date",
-            "end_date",
-            "price"
+            "intervals"
         );
 
         $data["created_by"] = Auth::id();
 
-        $hotelPrice = new HotelPrice();
-        $hotelPrice->adults_with_extra_bed = $data["adults_web"];
-        $hotelPrice->children_with_extra_bed = $data["child_web"];
-        $hotelPrice->children_without_extra_bed = $data["child_woeb"];
-        $hotelPrice->start_date = $data["start_date"];
-        $hotelPrice->end_date = $data["end_date"];
-
-        $toAttachLocations = array();
-        foreach ($data["locations"] as $locationId) {
-            $toAttachLocations[$locationId] = ["created_by" => $data["created_by"]];
-        }
-
-        $toAttachRoomTypes = array();
-        foreach ($data["room_types"] as $rtId) {
-            $toAttachRoomTypes[$rtId] = ["created_by" => $data["created_by"]];
-        }
-
-        $toAttachMealPlans = array();
-        foreach ($data["meal_plans"] as $mpId) {
-            $toAttachMealPlans[$mpId] = ["created_by" => $data["created_by"]];
-        }
-
-
-        // create price
-        $price = new Price();
-        $price->value = $data["price"];
-        $price->created_by = $data["created_by"];
-
         // start the transaction
         DB::beginTransaction();
 
-        $hotel->prices()->save($hotelPrice);
+        foreach ($data["intervals"] as $interval) {
+            $start_date = $interval["start_date"];
+            $end_date = $interval["end_date"];
+            // for each location
+            foreach ($data["locations"] as $location) {
+                // for each room types
+                foreach ($data["room_types"] as $room_type) {
+                    // for each meal plan's prices
+                    foreach ($data["meal_plans"] as $meal_plan => $prices) {
+                        $hotelPrice = new HotelPrice();
+                        $hotelPrice->location_id = $location;
+                        $hotelPrice->room_type_id = $room_type;
+                        $hotelPrice->meal_plan_id = $meal_plan;
+                        $hotelPrice->start_date = $start_date;
+                        $hotelPrice->end_date = $end_date;
 
-        if (count($toAttachLocations)) {
-            $hotelPrice->locations()->attach($toAttachLocations);
-        }
-        if (count($toAttachRoomTypes)) {
-            $hotelPrice->roomTypes()->attach($toAttachRoomTypes);
-        }
-        if (count($toAttachMealPlans)) {
-            $hotelPrice->mealPlans()->attach($toAttachMealPlans);
-        }
+                        // now store the price values
+                        $hotelPrice->base_price = $prices["base_price"];
+                        $hotelPrice->a_w_e_b = $prices["a_w_e_b"];
+                        $hotelPrice->c_w_e_b = $prices["c_w_e_b"];
+                        $hotelPrice->c_wo_e_b = $prices["c_wo_e_b"];
 
-        $hotelPrice->prices()->save($price);
+                        // attach the price to the hotel
+                        $hotel->prices()->save($hotelPrice);
+                    }
+                }
+            }
+        }
 
         DB::commit();
 

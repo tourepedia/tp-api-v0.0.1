@@ -64,19 +64,19 @@ $api->version('v1', function ($api) {
          * Routes for Roles
          */
         $api->get("/roles", [
-            "uses" => "App\Http\Controllers\Constants\UserRolesController@index",
+            "uses" => "App\Http\Controllers\Tags\UserRolesController@index",
             "as" => "api.user-roles.index"
         ]);
         $api->post("/roles", [
-            "uses" => "App\Http\Controllers\Constants\UserRolesController@store",
+            "uses" => "App\Http\Controllers\Tags\UserRolesController@store",
             "as" => "api.user-roles.store"
         ]);
         $api->get("/roles/{role}", [
-            "uses" => "App\Http\Controllers\Constants\UserRolesController@show",
+            "uses" => "App\Http\Controllers\Tags\UserRolesController@show",
             "as" => "api.user-roles.show"
         ]);
         $api->post("/roles/{role}/update-permissions", [
-            "uses" => "App\Http\Controllers\Constants\UserRolesController@updatePermissions",
+            "uses" => "App\Http\Controllers\Tags\UserRolesController@updatePermissions",
             "as" => "api.user-roles.update-permissions"
         ]);
 
@@ -135,29 +135,29 @@ $api->version('v1', function ($api) {
 
         // hotel room types
         $api->get("/hotel-room-types", [
-            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@index",
+            "uses" => "App\Http\Controllers\Tags\RoomTypesController@index",
             "as" => "api.hotel-room-types.index"
         ]);
         $api->post("/hotel-room-types", [
-            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@store",
+            "uses" => "App\Http\Controllers\Tags\RoomTypesController@store",
             "as" => "api.hotel-room-types.store"
         ]);
         $api->get("/hotel-room-types/{roomType}", [
-            "uses" => "App\Http\Controllers\Constants\HotelRoomTypesController@show",
+            "uses" => "App\Http\Controllers\Tags\RoomTypesController@show",
             "as" => "api.hotel-room-types.show"
         ]);
 
         // hotel meal plans
         $api->get("/hotel-meal-plans", [
-            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@index",
+            "uses" => "App\Http\Controllers\Tags\MealPlansController@index",
             "as" => "api.hotel-room-types.index"
         ]);
         $api->post("/hotel-meal-plans", [
-            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@store",
+            "uses" => "App\Http\Controllers\Tags\MealPlansController@store",
             "as" => "api.hotel-room-types.store"
         ]);
         $api->get("/hotel-meal-plans/{mealPlan}", [
-            "uses" => "App\Http\Controllers\Constants\HotelMealPlansController@show",
+            "uses" => "App\Http\Controllers\Tags\MealPlansController@show",
             "as" => "api.hotel-meal-plans.show"
         ]);
 

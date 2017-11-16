@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class HotelPrice extends Model
 {
     use SoftDeletes;
-    use ConstantableTrait;
 
     /**
      * Table name for the model
@@ -23,20 +22,17 @@ class HotelPrice extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('withPrices', function (Builder $builder) {
-            $builder->with("prices");
+
+        static::addGlobalScope('withLocation', function (Builder $builder) {
+            $builder->with("location");
         });
 
-        static::addGlobalScope('withLocations', function (Builder $builder) {
-            $builder->with("locations");
+        static::addGlobalScope('withRoomType', function (Builder $builder) {
+            $builder->with("roomType");
         });
 
-        static::addGlobalScope('withRoomTypes', function (Builder $builder) {
-            $builder->with("roomTypes");
-        });
-
-        static::addGlobalScope('withMealPlans', function (Builder $builder) {
-            $builder->with("mealPlans");
+        static::addGlobalScope('withMealPlan', function (Builder $builder) {
+            $builder->with("mealPlan");
         });
     }
 
@@ -48,50 +44,18 @@ class HotelPrice extends Model
     /**
      * Get all location models
      */
-    public function locations()
+    public function location()
     {
-        return $this->morphToMany("App\Models\Location", "locatable");
+        return $this->belongsTo("App\Models\Location");
     }
 
-
-    /**
-     * Get all of the room types
-     */
-    public function allRoomTypes()
+    public function roomType()
     {
-        return $this->morphToManyConstant('App\Models\Constants\HotelRoomType');
+        return $this->belongsTo("App\Models\Tags\RoomType");
     }
 
-    /**
-     * Get active room types.
-     */
-    public function roomTypes()
+    public function mealPlan()
     {
-        return $this->allRoomTypes()->withPivot("is_active")->where("is_active", 1);
-    }
-
-    /**
-     * Get all of the meal plans.
-     */
-    public function allMealPlans()
-    {
-        return $this->morphToManyConstant('App\Models\Constants\HotelMealPlan');
-    }
-
-
-    /**
-     * Get active meal plans.
-     */
-    public function mealPlans()
-    {
-        return $this->allMealPlans()->withPivot("is_active")->where("is_active", 1);
-    }
-
-    /**
-     * Get associated prices
-     */
-    public function prices()
-    {
-        return $this->morphMany("App\Models\Price", "priceable")->where("prices.is_active", 1);
+        return $this->belongsTo("App\Models\Tags\MealPlan");
     }
 }

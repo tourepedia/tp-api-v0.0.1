@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Constants\ConstantableTrait;
 
 class Hotel extends Model
 {
-    use ConstantableTrait;
-
     protected $table = "hotels";
 
     /**
@@ -32,7 +29,7 @@ class Hotel extends Model
      */
     public function allRoomTypes()
     {
-        return $this->morphToManyConstant('App\Models\Constants\HotelRoomType');
+        return $this->belongsToMany('App\Models\Tags\RoomType', "hotel_room_type");
     }
 
 
@@ -49,7 +46,7 @@ class Hotel extends Model
      */
     public function allMealPlans()
     {
-        return $this->morphToManyConstant('App\Models\Constants\HotelMealPlan');
+        return $this->belongsToMany('App\Models\Tags\MealPlan', "hotel_meal_plan");
     }
 
 

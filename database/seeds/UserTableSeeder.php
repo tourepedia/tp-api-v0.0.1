@@ -11,11 +11,21 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert([
-            'name' => 'Sudhir Mitharwal',
-            'email' => 'sudhir.mitharwal@tourepedia.com',
-            'password' => app('hash')->make('mitharwal'),
-            'remember_token' => str_random(10),
-        ]);
+        factory(App\Models\User::class, "super_admin")->create()->each(function ($u) {
+            $u->roles()->save(
+                // assign the super admin role
+                factory(App\Models\Tags\UserRole::class, "super_admin")->make()
+            )->each(function ($role) {
+                // give all the permisson to super admin, config("user.permissions")
+                $permissions = config("permissions.user");
+                foreach ($permissions as $permission => $description) {
+                    $new_permission = new App\Models\Permission();
+                    $new_permission->permission = $permission;
+                    $new_permission->created_by = 1;
+
+                    $role->permissions()->save($new_permission);
+                }
+            });
+        });
     }
 }

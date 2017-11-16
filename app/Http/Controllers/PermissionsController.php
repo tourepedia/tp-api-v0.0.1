@@ -8,12 +8,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PermissionsController extends Controller
 {
-
-    public function __construct(Application $app)
-    {
-        $app->configure('permissions');
-    }
-
     /**
      * Show the application permissions for $for object.
      *

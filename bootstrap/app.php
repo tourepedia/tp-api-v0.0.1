@@ -46,6 +46,9 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 
 $app->withEloquent();
+
+// configure the permissions
+$app->configure('permissions');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings

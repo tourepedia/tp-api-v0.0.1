@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Constants\ConstantableTrait;
 
 class User extends Model implements
     AuthenticatableContract,
@@ -16,7 +15,6 @@ class User extends Model implements
 {
     use Authenticatable, Authorizable;
     use SoftDeletes;
-    use ConstantableTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -74,7 +72,7 @@ class User extends Model implements
      */
     public function allRoles()
     {
-        return $this->morphToManyConstant('App\Models\Constants\UserRole');
+        return $this->belongsToMany("App\Models\Tags\UserRole", "user_role_pivot");
     }
 
 
