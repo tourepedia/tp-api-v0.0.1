@@ -15,7 +15,7 @@ class CreateMealPlansTable extends Migration
     {
         Schema::create('meal_plans', function (Blueprint $table) {
             $table->increments('id');
-            $table->string("name")-unique();
+            $table->string("name")->unique();
             $table->text("description")->nullable();
             $table->integer("created_by");
             $table->softDeletes();
