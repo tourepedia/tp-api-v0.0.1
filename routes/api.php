@@ -168,5 +168,21 @@ $api->version('v1', function ($api) {
             "uses" => "App\Http\Controllers\LocationsController@index",
             "as" => "api.locations.index"
         ]);
+
+        /**
+         * Routes for Tasks
+         */
+        $api->get("/tasks", [
+            "uses" => "App\Http\Controllers\TasksController@index",
+            "as" => "api.tasks.index"
+        ]);
+        $api->post("/tasks", [
+            "uses" => "App\Http\Controllers\TasksController@store",
+            "as" => "api.tasks.store"
+        ]);
+        $api->get("/tasks/{task}", [
+            "uses" => "App\Http\Controllers\TasksController@show",
+            "as" => "api.tasks.show"
+        ]);
     });
 });

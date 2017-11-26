@@ -18,13 +18,6 @@ class Contact extends Model
             $builder->with("phones");
         });
     }
-    /**
-     * Trips that belongs to the contact
-     */
-    public function trips()
-    {
-        return $this->morphedByMany("App\Models\Trip", "contactable");
-    }
 
     /**
      * Trips that belongs to the contact

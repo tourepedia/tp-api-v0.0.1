@@ -14,7 +14,7 @@ class ContactsController extends Controller
     public function index()
     {
         $contacts = Contact::with("phones")->get();
-        return ["contacts" => $contacts];
+        return ["data" => $contacts];
     }
 
     public function create()
@@ -43,17 +43,13 @@ class ContactsController extends Controller
         $contact->phones()->save($phone);
 
         DB::commit();
-
-        if (!$contact->phones) {
-            $contact->load("phones");
-        }
-        return ["contact" => $contact];
+        return $this->show($req, $contact->id);
     }
 
     public function show(Request $req, $contact_id)
     {
-        $contact = Contact::where("id", $contact_id)->with("phones", "hotels", "trips")->first();
+        $contact = Contact::where("id", $contact_id)->with("phones", "hotels")->first();
 
-        return ["contact" => $contact];
+        return ["data" => $contact];
     }
 }

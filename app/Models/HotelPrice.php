@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\Constants\ConstantableTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HotelPrice extends Model
