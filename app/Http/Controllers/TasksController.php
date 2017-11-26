@@ -30,20 +30,36 @@ class TasksController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "subject" => "required",
+            "assigness" => "array",
         ]);
 
         if ($validator->fails()) {
             throw new ResourceException('Invalid request.', $validator->errors());
         }
 
+        $creator = Auth::id();
+
         $task = new Task();
         $task->subject = $request->input("subject");
         $task->description = $request->input("description");
         $task->due_date = $request->input("due_date");
-        $task->created_by = Auth::id();
+        $task->created_by = $creator;
+
+        $assigness = $request->input("assigness");
+
+        $toAttachAssigness = array();
+        if ($assigness) {
+            foreach ($assigness as $assignes) {
+                $toAttachAssigness[$assignes] = ["created_by" => $creator];
+            }
+        }
+
 
         DB::beginTransaction();
         $task->save();
+        if (count($toAttachAssigness)) {
+            $task->allAssignees()->sync($toAttachAssigness);
+        }
         DB::commit();
 
         return $this->show($request, $task->id);

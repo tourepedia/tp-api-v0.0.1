@@ -85,12 +85,16 @@ class User extends Model implements
     }
 
     /**
-     * get all the tasks assigned to this user
+     * get all the tasks assigned to the user
      * fix: update the binding from created_by to assigned_to
-     * @return [type] [description]
      */
+    public function allTasks()
+    {
+        return $this->belongsToMany("App\Models\Task", "task_assignee", "user_id", "task_id")->withPivot("is_active");
+    }
+
     public function tasks()
     {
-        return $this->hasMany("App\Models\Task", "created_by");
+        return $this->allTasks()->wherePivot("is_active", 1);
     }
 }

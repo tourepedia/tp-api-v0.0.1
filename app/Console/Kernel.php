@@ -25,9 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->call(function () {
-        //     $tasks = Tasks::get();
-
-        // })->everyFiveMinutes();
+        $schedule->command('emails:tasks')
+            ->timezone('Asia/Kolkata')
+            ->dailyAt('06:00');
     }
 }
