@@ -30,7 +30,7 @@ class TasksController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "subject" => "required",
-            "assigness" => "array",
+            "assignees" => "array",
         ]);
 
         if ($validator->fails()) {
@@ -45,20 +45,20 @@ class TasksController extends Controller
         $task->due_date = $request->input("due_date");
         $task->created_by = $creator;
 
-        $assigness = $request->input("assigness");
+        $assignees = $request->input("assignees");
 
-        $toAttachAssigness = array();
-        if ($assigness) {
-            foreach ($assigness as $assignes) {
-                $toAttachAssigness[$assignes] = ["created_by" => $creator];
+        $toAttachAssignees = array();
+        if ($assignees) {
+            foreach ($assignees as $assignes) {
+                $toAttachAssignees[$assignes] = ["created_by" => $creator];
             }
         }
 
 
         DB::beginTransaction();
         $task->save();
-        if (count($toAttachAssigness)) {
-            $task->allAssignees()->sync($toAttachAssigness);
+        if (count($toAttachAssignees)) {
+            $task->allAssignees()->sync($toAttachAssignees);
         }
         DB::commit();
 

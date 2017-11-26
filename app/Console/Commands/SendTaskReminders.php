@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Console\Command;
 use App\Models\User;
+use Carbon\Carbon;
 
 class SendTaskReminders extends Command
 {
@@ -43,19 +44,27 @@ class SendTaskReminders extends Command
         $data = User::when($emailId, function ($query) use ($emailId) {
             return $query->where("email", $emailId);
         })->with(["tasks" => function ($tasks) {
-            return $tasks->withoutGlobalScopes();
+            $current = new Carbon();
+            $twoDaysNext = $current->addDays(2);
+            $twoDaysNextDateTimeString = $twoDaysNext->toDateTimeString();
+            return $tasks->withoutGlobalScopes()
+                ->whereNotNull("due_date")
+                // due date is within next two days
+                ->where("due_date", "<=", $twoDaysNextDateTimeString);
         }])->get();
 
 
         foreach ($data as $user) {
-            echo "Sending mail to ". $user->email . "...\n";
-            Mail::send("emails.tasks", ["user" => $user],
-                function($msg) use ($user) {
-                    $msg->subject("Your tasks for next two days.");
-                    $msg->to([$user->email]);
-                }
-            );
-            echo "Mail sent.\n";
+            if ($user->tasks && count($user->tasks)) {
+                echo "Sending mail to ". $user->email . " ... ";
+                Mail::send("emails.tasks", ["user" => $user],
+                    function($msg) use ($user) {
+                        $msg->subject("Your tasks for next two days.");
+                        $msg->to([$user->email]);
+                    }
+                );
+                echo " : sent. \n";
+            }
         }
 
     }
