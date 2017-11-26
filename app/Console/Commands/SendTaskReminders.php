@@ -38,7 +38,7 @@ class SendTaskReminders extends Command
     {
         $emailId = $this->argument('email');
         echo "Sending mail to ". $emailId. "...\n";
-        Mail::raw('Raw string email',
+        Mail::raw("Tasks email to some users.",
             function($msg) use ($emailId) {
                 $msg->to([$emailId]);
             }
