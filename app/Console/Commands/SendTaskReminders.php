@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Console\Command;
+use App\Models\User;
+
 class SendTaskReminders extends Command
 {
     /**
@@ -37,12 +39,24 @@ class SendTaskReminders extends Command
     public function handle()
     {
         $emailId = $this->argument('email');
-        echo "Sending mail to ". $emailId. "...\n";
-        Mail::raw("Tasks email to some users.",
-            function($msg) use ($emailId) {
-                $msg->to([$emailId]);
-            }
-        );
-        echo "Mail sent.";
+        // get the users along with tasks
+        $data = User::when($emailId, function ($query) use ($emailId) {
+            return $query->where("email", $emailId);
+        })->with(["tasks" => function ($tasks) {
+            return $tasks->withoutGlobalScopes();
+        }])->get();
+
+
+        foreach ($data as $user) {
+            echo "Sending mail to ". $user->email . "...\n";
+            Mail::send("emails.tasks", ["user" => $user],
+                function($msg) use ($user) {
+                    $msg->subject("Your tasks for next two days.");
+                    $msg->to([$user->email]);
+                }
+            );
+            echo "Mail sent.\n";
+        }
+
     }
 }

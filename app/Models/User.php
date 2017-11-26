@@ -83,4 +83,14 @@ class User extends Model implements
     {
         return $this->allRoles()->withPivot("is_active");
     }
+
+    /**
+     * get all the tasks assigned to this user
+     * fix: update the binding from created_by to assigned_to
+     * @return [type] [description]
+     */
+    public function tasks()
+    {
+        return $this->hasMany("App\Models\Task", "created_by");
+    }
 }
