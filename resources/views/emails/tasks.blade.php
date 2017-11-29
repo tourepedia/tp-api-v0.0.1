@@ -6,7 +6,7 @@
             <tr>
                 <th style="padding: 5px 10px;">#</th>
                 <th style="padding: 5px 10px;">Subject</th>
-                <th style="padding: 5px 10px;">Due Date (UTC)</th>
+                <th style="padding: 5px 10px;">Due Date (Asia/Kolkata)</th>
             </tr>
         </thead>
         <tbody>
@@ -17,7 +17,7 @@
                 <tr>
                     <td style="padding: 5px 10px;">{{ $i }}</td>
                     <td style="padding: 5px 10px;">{{ $task->subject }}</td>
-                    <td style="padding: 10px;">{{ $task->due_date }}</td>
+                    <td style="padding: 10px;">{{ $task->due_date->format('l jS \\of F Y h:i:s A') }}</td>
                 </tr>
                 @php
                     $i++;

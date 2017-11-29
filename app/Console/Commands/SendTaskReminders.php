@@ -44,21 +44,29 @@ class SendTaskReminders extends Command
         $data = User::when($emailId, function ($query) use ($emailId) {
             return $query->where("email", $emailId);
         })->with(["tasks" => function ($tasks) {
-            $current = new Carbon();
-            $twoDaysNext = $current->addDays(2);
+            $current = new Carbon("UTC");
+            $twoDaysNext = $current->copy()->addDays(2);
+            $currentDatetTimeString = $current->toDateTimeString();
             $twoDaysNextDateTimeString = $twoDaysNext->toDateTimeString();
             return $tasks->withoutGlobalScopes()
                 ->whereNotNull("due_date")
                 // due date is within next two days
-                ->where("due_date", "<=", $twoDaysNextDateTimeString);
+                ->where("due_date", "<=", $twoDaysNextDateTimeString)
+                ->where("due_date", ">", $currentDatetTimeString);
         }])->get();
-
-
         foreach ($data as $user) {
             if ($user->tasks && count($user->tasks)) {
                 echo "Sending mail to ". $user->email . " ... ";
-                Mail::send("emails.tasks", ["user" => $user],
-                    function($msg) use ($user) {
+                $user->tasks = $user->tasks->map(function ($task) {
+                    $due_date = new Carbon($task->due_date, "UTC");
+                    $due_date->setTimezone("Asia/Kolkata");
+                    $task->due_date = $due_date;
+                    return $task;
+                });
+                Mail::send(
+                    "emails.tasks",
+                    ["user" => $user],
+                    function ($msg) use ($user) {
                         $msg->subject("Your tasks for next two days.");
                         $msg->to([$user->email]);
                     }
@@ -66,6 +74,5 @@ class SendTaskReminders extends Command
                 echo " : sent. \n";
             }
         }
-
     }
 }
