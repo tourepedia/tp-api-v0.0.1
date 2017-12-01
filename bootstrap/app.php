@@ -82,12 +82,13 @@ $app->singleton(
 */
 
 $app->middleware([
-    App\Http\Middleware\CORSMiddleware::class
+    App\Http\Middleware\CORSMiddleware::class,
+    App\Http\Middleware\ResponseCompressionMiddleware::class,
 ]);
 
-//$app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-//]);
+$app->routeMiddleware([
+    'compression' =>  App\Http\Middleware\ResponseCompressionMiddleware::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
