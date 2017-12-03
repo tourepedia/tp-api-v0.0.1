@@ -10,14 +10,14 @@ class RoomTypeTableSeeder extends Seeder
      * @return void
      */
     private $roomTypes = [
-        "Twin" =>    "A room which has two single bed separated by a center table",
+        "Superior Room"  =>   "Middle Category Room",
         "Deluxe" =>   "Special",
         "Super Room"  =>   "Base Category Room",
-        "Superior Room"  =>   "Middle Category Room",
-        "Suit Room"  =>  "Highest Category Room",
+        "Swiss Tent" =>   "Tented Accommodation",
         "Executive Room"  =>  "Good Room",
         "Super Deluxe Room"  =>  "upper category room",
-        "Swiss Tent" =>   "Tented Accommodation",
+        "Twin" =>    "A room which has two single bed separated by a center table",
+        "Suite Room"  =>  "Highest Category Room",
         "Cottage Room"  =>  "Traditional Style Room",
         "Luxury Lake View Room"  =>  "Lake facing Room",
         "Royal Deluxe Room"  =>  "Decent Room",

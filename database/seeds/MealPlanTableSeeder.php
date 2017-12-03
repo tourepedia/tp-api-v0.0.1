@@ -10,8 +10,8 @@ class MealPlanTableSeeder extends Seeder
      * @return void
      */
     private $mealPlans = [
-        "MAP" => "Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)",
         "CP" => "Continental Plan (Breakfast)",
+        "MAP" => "Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)",
         "AP" => "Breakfast+Lunch+Dinner",
         "EP" => "Room Only",
     ];
