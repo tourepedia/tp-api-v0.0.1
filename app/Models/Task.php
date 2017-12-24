@@ -26,12 +26,14 @@ class Task extends Model
         });
     }
 
-    public function author () {
+    public function author()
+    {
         return $this->belongsTo("App\Models\User", "created_by");
     }
 
-    public function allAssignees () {
-       return $this->belongsToMany("App\Models\User", "task_assignee", "task_id", "user_id")->withPivot("is_active");
+    public function allAssignees()
+    {
+        return $this->belongsToMany("App\Models\User", "task_assignee", "task_id", "user_id")->withPivot("is_active");
     }
 
     public function assignees()

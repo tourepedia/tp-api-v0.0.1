@@ -185,4 +185,8 @@ $api->version('v1', function ($api) {
             "as" => "api.tasks.show"
         ]);
     });
+    $api->get("/pusher", function () {
+        event(new App\Events\TaskAssignmentEvent('Hi, Task assigned to you.'));
+        return "Event has been sent!";
+    });
 });

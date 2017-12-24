@@ -49,6 +49,7 @@ $app->withEloquent();
 
 // configure the permissions
 $app->configure('permissions');
+class_alias(Pusher\Pusher::class, "Pusher");
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
